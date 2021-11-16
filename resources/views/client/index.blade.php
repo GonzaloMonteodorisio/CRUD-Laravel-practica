@@ -4,7 +4,7 @@
 
     <div class="container py-5 text-center">
         <h1>Listado de Clientes</h1>
-        <a href="{{ route('client.index') }}" class="btn btn-primary">Crear Cliente</a>
+        <a href="{{ route('client.create') }}" class="btn btn-primary">Crear Cliente</a>
 
         <table class="table">
             <thead>

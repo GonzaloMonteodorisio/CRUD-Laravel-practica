@@ -24,7 +24,7 @@ class ClientController extends Controller
      */
     public function create()
     {
-        //
+        return view('client.form');
     }
 
     /**
@@ -35,7 +35,15 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|max:15',
+            'due' => 'required|gte:50'
+        ]);
+
+        // Paso, como parámetro, todo lo necesario para que haga la inserción en la base de datos.
+        // only() es para que no se manden parámetros adicionales de la estructura que no son parte de la estructura del modelo.
+        $client = Client::create($request->only('name', 'due', 'comments'));
+        return redirect()->route('client.index');
     }
 
     /**
