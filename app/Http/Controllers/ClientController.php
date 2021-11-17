@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+// use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class ClientController extends Controller
 {
@@ -14,7 +16,10 @@ class ClientController extends Controller
      */
     public function index()
     {
-        return view('client.index');
+        // Qué información queremos tomar
+        $clients = Client::paginate(5);
+        // Retornamos lo que queremos ver en la vista
+        return view('client.index')->with('clients', $clients);
     }
 
     /**
@@ -37,12 +42,16 @@ class ClientController extends Controller
     {
         $request->validate([
             'name' => 'required|max:15',
-            'due' => 'required|gte:50'
+            'due' => 'required|gte:1'
         ]);
 
         // Paso, como parámetro, todo lo necesario para que haga la inserción en la base de datos.
         // only() es para que no se manden parámetros adicionales de la estructura que no son parte de la estructura del modelo.
+        // Forma masiva
         $client = Client::create($request->only('name', 'due', 'comments'));
+        // Confirmación de registro exitoso
+        Session::flash('mensaje', 'Registro guardado con éxito!');
+        // Retorno a /client
         return redirect()->route('client.index');
     }
 
@@ -65,7 +74,7 @@ class ClientController extends Controller
      */
     public function edit(Client $client)
     {
-        //
+        return view('client.form')->with('client', $client);
     }
 
     /**
@@ -77,7 +86,23 @@ class ClientController extends Controller
      */
     public function update(Request $request, Client $client)
     {
-        //
+        $request->validate([
+            'name' => 'required|max:15',
+            'due' => 'required|gte:1'
+        ]);
+
+        // Forma individual
+        $client->name = $request['name'];
+        $client->due = $request['due'];
+        $client->comments = $request['comments'];
+
+        // Guardando en base de datos (persistencia)
+        $client->save();
+
+        // Confirmación de registro exitoso
+        Session::flash('mensaje', 'Registro editado con éxito!');
+        // Retorno a /client
+        return redirect()->route('client.index');
     }
 
     /**
@@ -88,6 +113,11 @@ class ClientController extends Controller
      */
     public function destroy(Client $client)
     {
-        //
+        $client->delete();
+
+        // Confirmación de registro exitoso
+        Session::flash('mensaje', 'Registro Eliminado con Éxito!');
+        // Retorno a /client
+        return redirect()->route('client.index');
     }
 }
